@@ -1,3 +1,4 @@
+import type { AudioPlayer } from "@discordjs/voice";
 import type {
   AutocompleteInteraction,
   ChatInputCommandInteraction,
@@ -41,13 +42,15 @@ export interface BotEvent {
   execute: (...args) => void;
 }
 
-declare module "bun" {
-  interface Env {
-    TOKEN: string;
-    CLIENT_ID: string;
-    GUILD_ID: string;
-    TWITCH_CLIENT_ID: string;
-    TWITCH_CLIENT_SECRET: string;
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      TOKEN: string;
+      CLIENT_ID: string;
+      GUILD_ID: string;
+      TWITCH_CLIENT_ID: string;
+      TWITCH_CLIENT_SECRET: string;
+    }
   }
 }
 
@@ -57,5 +60,6 @@ declare module "discord.js" {
     commands: Collection<string, Command>;
     cooldowns: Collection<string, number>;
     tasks: Collection<string, Task>;
+    players: Collection<string, AudioPlayer>;
   }
 }
