@@ -18,9 +18,18 @@ export const usePlayer = (client: Client, guildId: string) => {
     });
 
     player.on(AudioPlayerStatus.AutoPaused, () => {
+      console.log("AutoPaused");
       setTimeout(() => {
         useStopVoice(client, guildId);
       }, 30_000);
+    });
+
+    player.on(AudioPlayerStatus.Buffering, () => {
+      console.log("Buffering");
+    });
+
+    player.on(AudioPlayerStatus.Playing, () => {
+      console.log("Playing");
     });
 
     players.set(key, player);
