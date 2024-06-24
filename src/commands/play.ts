@@ -9,12 +9,12 @@ import type { SlashCommand } from "@/types";
 const command: SlashCommand = {
   command: new SlashCommandBuilder()
     .setName("play")
-    .setDescription("Plays a song")
+    .setDescription("Plays a song from YouTube")
     .addStringOption((option) =>
-      option.setName("url").setDescription("URL of the song").setRequired(true)
+      option.setName("song").setDescription("URL or name of the song").setRequired(true)
     ),
   execute: async (interaction) => {
-    const url = interaction.options.getString("url", true);
+    const url = interaction.options.getString("song", true);
 
     const connection = getVoiceConnection(interaction.guildId!);
     if (!connection) {

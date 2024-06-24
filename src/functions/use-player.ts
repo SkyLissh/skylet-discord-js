@@ -24,14 +24,6 @@ export const usePlayer = (client: Client, guildId: string) => {
       }, 30_000);
     });
 
-    player.on(AudioPlayerStatus.Buffering, () => {
-      console.log("Buffering");
-    });
-
-    player.on(AudioPlayerStatus.Playing, () => {
-      console.log("Playing");
-    });
-
     players.set(key, player);
   }
 
