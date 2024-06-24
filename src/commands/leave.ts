@@ -1,6 +1,5 @@
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 
-import { useStopVoice } from "@/functions/use-stop-voice";
 import type { SlashCommand } from "@/types";
 
 const command: SlashCommand = {
@@ -8,7 +7,7 @@ const command: SlashCommand = {
     .setName("leave")
     .setDescription("Leaves the voice channel you are in"),
   execute: async (interaction) => {
-    useStopVoice(interaction.client, interaction.guildId!);
+    interaction.client.distube.voices.leave(interaction.guild!);
 
     interaction.reply({
       embeds: [

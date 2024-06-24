@@ -8,6 +8,7 @@ import type {
   PermissionResolvable,
   SharedSlashCommand,
 } from "discord.js";
+import type { DisTube, DisTubeEvents } from "distube";
 
 export interface SlashCommand {
   command: SharedSlashCommand;
@@ -42,6 +43,11 @@ export interface BotEvent {
   execute: (...args) => void;
 }
 
+export interface DistubeEvent {
+  name: keyof DisTubeEvents;
+  execute: (...args) => void;
+}
+
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
@@ -61,5 +67,6 @@ declare module "discord.js" {
     cooldowns: Collection<string, number>;
     tasks: Collection<string, Task>;
     players: Collection<string, AudioPlayer>;
+    distube: DisTube;
   }
 }

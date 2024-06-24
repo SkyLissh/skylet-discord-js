@@ -1,9 +1,7 @@
-import ytdl from "ytdl-core";
+import type { GuildMember } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
+import { z } from "zod";
 
-import { createAudioResource, getVoiceConnection } from "@discordjs/voice";
-import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-
-import { usePlayer } from "@/functions/use-player";
 import type { SlashCommand } from "@/types";
 
 const command: SlashCommand = {
@@ -16,41 +14,35 @@ const command: SlashCommand = {
   execute: async (interaction) => {
     const url = interaction.options.getString("song", true);
 
-    const connection = getVoiceConnection(interaction.guildId!);
-    if (!connection) {
+    if (z.string().url().safeParse(url).error) {
       interaction.reply({
-        content: "No connection found",
+        content: "Invalid URL",
         ephemeral: true,
       });
       return;
     }
 
-    const stream = ytdl(url, { filter: "audioonly" });
-    const info = await ytdl.getInfo(url);
+    const member = interaction.member as GuildMember;
+    const channel = member.voice.channel;
+    if (!channel || !channel.isVoiceBased()) return;
 
-    const resource = createAudioResource(stream);
+    interaction.client.distube.play(channel, url);
 
-    const player = usePlayer(interaction.client, interaction.guildId!);
-
-    connection.subscribe(player);
-    player.play(resource);
-
-    interaction.reply({
-      embeds: [
-        new EmbedBuilder()
-          .setColor("#e30026")
-          .setTitle(`Playing ${info.videoDetails.title}`)
-          .setURL(info.videoDetails.video_url)
-          .setAuthor({
-            name: info.videoDetails.author.name,
-            iconURL: info.videoDetails.author.thumbnails?.[0].url,
-          })
-          .setImage(info.videoDetails.thumbnails[0].url)
-          .setFooter({ text: "Created at" })
-          .setTimestamp(Date.parse(info.videoDetails.publishDate)),
-      ],
-      ephemeral: true,
-    });
+    // interaction.reply({
+    //   embeds: [
+    //     new EmbedBuilder()
+    //       .setColor("#e30026")
+    //       .setTitle(`Playing ${info.videoDetails.title}`)
+    //       .setURL(info.videoDetails.video_url)
+    //       .setAuthor({
+    //         name: info.videoDetails.author.name,
+    //         iconURL: info.videoDetails.author.thumbnails?.[0].url,
+    //       })
+    //       .setImage(info.videoDetails.thumbnails[0].url)
+    //       .setFooter({ text: "Created at" })
+    //       .setTimestamp(Date.parse(info.videoDetails.publishDate)),
+    //   ],
+    // });
   },
 };
 

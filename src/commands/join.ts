@@ -1,5 +1,5 @@
-import { VoiceConnectionStatus, entersState, joinVoiceChannel } from "@discordjs/voice";
-import { EmbedBuilder, SlashCommandBuilder, type VoiceBasedChannel } from "discord.js";
+import type { GuildMember } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 
 import type { SlashCommand } from "@/types";
 
@@ -8,22 +8,11 @@ const command: SlashCommand = {
     .setName("join")
     .setDescription("Joins the voice channel you are in"),
   execute: async (interaction) => {
-    const channel = interaction.channel;
+    const member = interaction.member as GuildMember;
+    const channel = member.voice.channel;
     if (!channel || !channel.isVoiceBased()) return;
 
-    const connection = joinVoiceChannel({
-      channelId: channel.id,
-      guildId: (channel as VoiceBasedChannel).guild.id,
-      adapterCreator: (channel as VoiceBasedChannel).guild.voiceAdapterCreator,
-    });
-
-    connection.on(VoiceConnectionStatus.Signalling, () => {
-      console.log("Connecting...");
-    });
-    connection.on(VoiceConnectionStatus.Ready, () => {
-      console.log("Player ready");
-    });
-    await entersState(connection, VoiceConnectionStatus.Signalling, 5_000);
+    interaction.client.distube.voices.join(channel);
 
     interaction.reply({
       embeds: [
