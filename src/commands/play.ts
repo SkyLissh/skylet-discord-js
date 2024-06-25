@@ -1,5 +1,5 @@
 import type { GuildMember } from "discord.js";
-import { SlashCommandBuilder } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { z } from "zod";
 
 import type { SlashCommand } from "@/types";
@@ -26,23 +26,29 @@ const command: SlashCommand = {
     const channel = member.voice.channel;
     if (!channel || !channel.isVoiceBased()) return;
 
-    interaction.client.distube.play(channel, url);
+    await interaction.client.distube.play(channel, url);
+    const queue = await interaction.client.distube.getQueue(channel);
+    if (!queue) return;
 
-    // interaction.reply({
-    //   embeds: [
-    //     new EmbedBuilder()
-    //       .setColor("#e30026")
-    //       .setTitle(`Playing ${info.videoDetails.title}`)
-    //       .setURL(info.videoDetails.video_url)
-    //       .setAuthor({
-    //         name: info.videoDetails.author.name,
-    //         iconURL: info.videoDetails.author.thumbnails?.[0].url,
-    //       })
-    //       .setImage(info.videoDetails.thumbnails[0].url)
-    //       .setFooter({ text: "Created at" })
-    //       .setTimestamp(Date.parse(info.videoDetails.publishDate)),
-    //   ],
-    // });
+    const song = queue.songs.at(-1);
+    if (!song) return;
+
+    console.log(song.metadata);
+
+    interaction.reply({
+      embeds: [
+        new EmbedBuilder()
+          .setColor("#e30026")
+          .setTitle(`Playing ${song.name}`)
+          .setURL(song.url!)
+          .setAuthor({
+            name: song.uploader.name!,
+            url: song.uploader.url!,
+          })
+          .setImage(song.thumbnail!)
+          .setFooter({ text: `Duration: ${song.formattedDuration}` }),
+      ],
+    });
   },
 };
 
