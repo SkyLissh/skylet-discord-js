@@ -1,4 +1,3 @@
-import type { AudioPlayer } from "@discordjs/voice";
 import type {
   AutocompleteInteraction,
   ChatInputCommandInteraction,
@@ -56,6 +55,9 @@ declare global {
       GUILD_ID: string;
       TWITCH_CLIENT_ID: string;
       TWITCH_CLIENT_SECRET: string;
+      MC_SERVER_IP: string;
+      SSH_KEY_PATH: string;
+      SSH_CONNECTION: string;
     }
   }
 }
@@ -66,7 +68,6 @@ declare module "discord.js" {
     commands: Collection<string, Command>;
     cooldowns: Collection<string, number>;
     tasks: Collection<string, Task>;
-    players: Collection<string, AudioPlayer>;
     distube: DisTube;
   }
 }

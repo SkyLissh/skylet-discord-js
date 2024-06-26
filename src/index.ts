@@ -19,7 +19,6 @@ const client = new Client({
 client.slashCommands = new Collection();
 client.cooldowns = new Collection();
 client.tasks = new Collection();
-client.players = new Collection();
 client.distube = new DisTube(client, {
   emitNewSongOnly: true,
   plugins: [new YouTubePlugin()],
