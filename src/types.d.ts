@@ -1,3 +1,4 @@
+import type { AudioPlayer } from "@discordjs/voice";
 import type {
   AutocompleteInteraction,
   ChatInputCommandInteraction,
@@ -7,6 +8,7 @@ import type {
   PermissionResolvable,
   SharedSlashCommand,
 } from "discord.js";
+import type { DisTube, DisTubeEvents } from "distube";
 
 export interface SlashCommand {
   command: SharedSlashCommand;
@@ -41,13 +43,20 @@ export interface BotEvent {
   execute: (...args) => void;
 }
 
-declare module "bun" {
-  interface Env {
-    TOKEN: string;
-    CLIENT_ID: string;
-    GUILD_ID: string;
-    TWITCH_CLIENT_ID: string;
-    TWITCH_CLIENT_SECRET: string;
+export interface DistubeEvent {
+  name: keyof DisTubeEvents;
+  execute: (...args) => void;
+}
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      TOKEN: string;
+      CLIENT_ID: string;
+      GUILD_ID: string;
+      TWITCH_CLIENT_ID: string;
+      TWITCH_CLIENT_SECRET: string;
+    }
   }
 }
 
@@ -57,5 +66,7 @@ declare module "discord.js" {
     commands: Collection<string, Command>;
     cooldowns: Collection<string, number>;
     tasks: Collection<string, Task>;
+    players: Collection<string, AudioPlayer>;
+    distube: DisTube;
   }
 }

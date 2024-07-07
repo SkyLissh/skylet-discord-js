@@ -29,7 +29,10 @@ const task: Task = {
     const channel = client.channels.cache.get(channelId);
     if (!channel || !channel.isTextBased()) return;
 
-    (channel as TextChannel).send({ embeds: [useStreamEmbed(stream, user, game)] });
+    (channel as TextChannel).send({
+      content: `:red_circle: ${stream.user_name} is live on Twitch! @everyone`,
+      embeds: [useStreamEmbed(stream, user, game)],
+    });
 
     latTick = true;
   },

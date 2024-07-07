@@ -10,9 +10,10 @@
 
     // Bundler mode
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
-    "noEmit": true,
+    // TODO: Change this if bun works with this later
+    "noEmit": false,
+    "allowImportingTsExtensions": false,
 
     // Best practices
     "strict": true,
@@ -28,6 +29,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
 
+    "outDir": "dist",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]

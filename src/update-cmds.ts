@@ -1,12 +1,16 @@
 import fs from "fs";
 import path from "path";
 
+import dotenv from "dotenv";
+
 import { REST } from "@discordjs/rest";
 import type { SharedSlashCommand } from "discord.js";
 import { Routes } from "discord.js";
 
 import { err, text, variable } from "@/theme";
 import type { SlashCommand } from "@/types";
+
+dotenv.config();
 
 const update = async () => {
   const commands: SharedSlashCommand[] = [];
