@@ -16,8 +16,10 @@ const command: SlashCommand = {
     )
     .addSubcommand((subcommand) =>
       subcommand.setName("start").setDescription("Start the server")
+    )
+    .addSubcommand((subcommand) =>
+      subcommand.setName("stop").setDescription("Stop the server")
     ),
-
   execute(interaction) {
     const subcommand = interaction.options.getSubcommand() as MCServerSubcommand;
 
@@ -46,6 +48,7 @@ async function status(interaction: ChatInputCommandInteraction) {
           .setDescription("The Minecraft server is offline.")
           .setColor("#6441A4"),
       ],
+      ephemeral: true,
     });
     return;
   }
@@ -57,19 +60,35 @@ async function status(interaction: ChatInputCommandInteraction) {
           name: "Server from MasterJMVR",
         })
         .setTitle(":gem: Minecraft server is online")
-        .setDescription(status.motd![0].clean.join("\n"))
-        .setURL(process.env.MC_SERVER_IP)
+        .setDescription(status.motd!.clean.join("\n"))
+        .addFields({
+          name: ":busts_in_silhouette: Players:",
+          value: `${status.players!.online}/${status.players!.max}`,
+        })
         .setColor("#6441A4"),
     ],
   });
 }
 
 async function start(interaction: ChatInputCommandInteraction) {
+  const status = await useMcServerStatus();
+  if (status.online) {
+    interaction.reply({
+      embeds: [
+        new EmbedBuilder()
+          .setTitle("Minecraft server is already online")
+          .setColor("#6441A4"),
+      ],
+      ephemeral: true,
+    });
+    return;
+  }
+
   const connection = process.env.SSH_CONNECTION;
   const key = process.env.SSH_KEY_PATH;
 
   const { stdout: _, stderr } = await execAsync(
-    `ssh -i ${key} ${connection} 'screen -S server -X stuff "start\n"'`
+    `ssh -i ${key} ${connection} 'screen -S server -X ./run.sh'`
   );
 
   if (stderr) {
@@ -91,6 +110,18 @@ async function start(interaction: ChatInputCommandInteraction) {
 }
 
 async function stop(interaction: ChatInputCommandInteraction) {
+  const status = await useMcServerStatus();
+  if (!status.online) {
+    interaction.reply({
+      embeds: [
+        new EmbedBuilder()
+          .setTitle("Minecraft server is already offline")
+          .setColor("#6441A4"),
+      ],
+    });
+    return;
+  }
+
   const connection = process.env.SSH_CONNECTION;
   const key = process.env.SSH_KEY_PATH;
 
