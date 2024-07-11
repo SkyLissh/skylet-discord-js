@@ -11,3 +11,4 @@ services:
     command: pnpm start
     env_file:
       - .env
+    restart: always
