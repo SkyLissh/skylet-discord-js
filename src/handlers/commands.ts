@@ -9,9 +9,12 @@ import type { SlashCommand } from "@/types";
 export default async (client: Client) => {
   const slashCmdsDir = path.join(import.meta.dirname, "../commands");
 
-  const files = await fs.promises.readdir(slashCmdsDir);
+  const files = await fs.promises.readdir(slashCmdsDir, { recursive: true });
 
   for (const file of files) {
+    if (!file.endsWith(".ts")) continue;
+    if (file.includes("subcommands")) continue;
+
     const { default: cmd }: { default: SlashCommand } = await import(
       `${slashCmdsDir}/${file}`
     );
