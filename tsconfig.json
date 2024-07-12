@@ -9,10 +9,10 @@
     "allowJs": true,
 
     // Bundler mode
-    "moduleResolution": "bundler",
+    "moduleResolution": "Bundler",
     "verbatimModuleSyntax": true,
     // TODO: Change this if bun works with this later
-    "noEmit": false,
+    "noEmit": true,
     "allowImportingTsExtensions": false,
 
     // Best practices

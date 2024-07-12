@@ -25,6 +25,11 @@ export interface Command {
   cooldown?: number;
 }
 
+export interface Subcommand {
+  name: string;
+  execute: (interaction: ChatInputCommandInteraction) => void;
+}
+
 export interface Task {
   name: string;
   execute: (client: Client) => void;

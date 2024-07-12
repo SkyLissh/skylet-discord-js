@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  app:
+    image: skylet-discord:latest
+    container_name: skylet-discord
+    build:
+      target: production
+      context: .
+      dockerfile: Dockerfile
+    command: pnpm start
+    env_file:
+      - .env
+    restart: always
