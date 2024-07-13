@@ -13,12 +13,13 @@ const task: Task = {
   cronTime: "*/5 * * * *",
   execute: async (client) => {
     const stream = await useTwitchStream("skylissh");
-    if (!stream) return;
 
     if (!stream && latTick) {
       latTick = false;
       return;
     }
+    if (!stream) return;
+    if (stream && latTick) return;
 
     const user = await useTwitchUser("skylissh");
     if (!user) return;
