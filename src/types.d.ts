@@ -63,6 +63,8 @@ declare global {
       MC_SERVER_IP: string;
       SSH_KEY_PATH: string;
       SSH_CONNECTION: string;
+      DATABASE_URL: string;
+      AUTH_TOKEN: string;
     }
   }
 }

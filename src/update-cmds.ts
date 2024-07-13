@@ -15,9 +15,14 @@ dotenv.config();
 const update = async () => {
   const commands: SharedSlashCommand[] = [];
 
-  const files = await fs.promises.readdir(path.join(import.meta.dirname, "./commands"));
+  const files = await fs.promises.readdir(path.join(import.meta.dirname, "./commands"), {
+    recursive: true,
+  });
 
   for (const file of files) {
+    if (!file.endsWith(".ts")) continue;
+    if (file.includes("subcommands")) continue;
+
     const { default: cmd }: { default: SlashCommand } = await import(
       `./commands/${file}`
     );
