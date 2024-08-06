@@ -8,7 +8,8 @@
     "start": "node dist/index.js",
     "start:dev": "NODE_ENV=development tsx src/index.ts",
     "updatecmds:dev": "NODE_ENV=development tsx src/update-cmds.ts",
-    "updatecmds:prod": "NODE_ENV=production tsx src/update-cmds.ts"
+    "updatecmds:prod": "NODE_ENV=production tsx src/update-cmds.ts",
+    "deletecmds:dev": "NODE_ENV=development tsx src/delete-cmds.ts"
   },
   "devDependencies": {
     "@types/ws": "^8.5.10",
