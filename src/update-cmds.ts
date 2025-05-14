@@ -1,16 +1,15 @@
 import fs from "fs";
 import path from "path";
 
-import dotenv from "dotenv";
-
 import { REST } from "@discordjs/rest";
 import type { SharedSlashCommand } from "discord.js";
 import { Routes } from "discord.js";
 
-import { err, text, variable } from "@/theme";
 import type { SlashCommand } from "@/types";
+import { env } from "./env";
+import { logger } from "./logger";
 
-dotenv.config();
+process.loadEnvFile();
 
 const update = async () => {
   const commands: SharedSlashCommand[] = [];
@@ -24,22 +23,22 @@ const update = async () => {
     commands.push(cmd.command);
   }
 
-  const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
+  const rest = new REST({ version: "10" }).setToken(env.DISCORD_TOKEN);
   const route =
-    process.env.NODE_ENV === "development"
-      ? Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID)
-      : Routes.applicationCommands(process.env.CLIENT_ID);
+    env.NODE_ENV === "development"
+      ? Routes.applicationGuildCommands(env.DISCORD_CLIENT_ID, env.DISCORD_GUILD_ID)
+      : Routes.applicationCommands(env.DISCORD_CLIENT_ID);
 
   try {
     const res = await rest.put(route, {
       body: commands.map((c) => c.toJSON()),
     });
 
-    console.log(
-      `${text("🚀 Successfully created/updated")} ${variable((res as unknown[]).length)} ${text("slash command(s)")}`
+    logger.info(
+      `🚀 Successfully created/updated ${(res as unknown[]).length} slash command(s)`
     );
   } catch (e) {
-    console.log(err(e));
+    logger.error(e);
   }
 };
 

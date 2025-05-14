@@ -4,4 +4,5 @@
   },
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "cSpell.words": ["deletecmds", "distube", "eventsub", "libsodium", "updatecmds"]
 }

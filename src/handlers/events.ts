@@ -3,7 +3,7 @@ import path from "path";
 
 import type { Client } from "discord.js";
 
-import { text, variable } from "@/theme";
+import { logger } from "@/logger";
 import type { BotEvent } from "@/types";
 
 export default (client: Client) => {
@@ -17,6 +17,6 @@ export default (client: Client) => {
     if (event.once) client.once(event.name, (...args) => event.execute(...args));
     else client.on(event.name, (...args) => event.execute(...args));
 
-    console.log(`${text("🌠 Successfully loaded event")} ${variable(event.name)}`);
+    logger.info(`🌠 Successfully loaded event ${event.name}`);
   });
 };

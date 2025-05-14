@@ -1,9 +1,9 @@
 import { EmbedBuilder } from "discord.js";
 
-import { useFormatNumber } from "@/functions/use-format-number";
-import type { TwitchUser } from "@/models/twitch";
+import { formatNumber } from "@/functions/format-number";
+import type { TwitchUser } from "@/schemas/twitch/twitch-user";
 
-export const useTwitchUserEmbed = (user: TwitchUser, followers: number) => {
+export const createTwitchUserEmbed = (user: TwitchUser, followers: number) => {
   return new EmbedBuilder()
     .setTitle(`${user.display_name} is on Twitch!`)
     .setDescription(user.description)
@@ -11,7 +11,7 @@ export const useTwitchUserEmbed = (user: TwitchUser, followers: number) => {
     .setThumbnail(user.profile_image_url)
     .addFields({
       name: ":busts_in_silhouette: Followers",
-      value: useFormatNumber(followers),
+      value: formatNumber(followers),
     })
     .addFields({ name: ":eyes: Views", value: user.view_count })
     .setFooter({ text: "Created at" })
