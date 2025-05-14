@@ -2,12 +2,13 @@ import { SlashCommandBuilder } from "discord.js";
 
 import type { SlashCommand } from "@/types";
 
-import { useStreamEmbed, useTwitchUserEmbed } from "@/functions/embeds";
+import { createStreamEmbed } from "@/functions/embeds/create-stream-embed";
+import { createTwitchUserEmbed } from "@/functions/embeds/create-twitch-user-embed";
 import {
-  useTwitchFollowers,
-  useTwitchGame,
-  useTwitchStream,
-  useTwitchUser,
+  fetchTwitchFollowers,
+  fetchTwitchGame,
+  fetchTwitchStream,
+  fetchTwitchUser,
 } from "@/functions/twitch";
 
 const command: SlashCommand = {
@@ -24,23 +25,23 @@ const command: SlashCommand = {
     ),
   execute: async (interaction) => {
     const username = interaction.options.getString("user", true);
-    const stream = await useTwitchStream(username);
+    const stream = await fetchTwitchStream(username);
 
-    const user = await useTwitchUser(username);
+    const user = await fetchTwitchUser(username);
     if (!user) return;
 
     if (stream) {
-      const game = await useTwitchGame(stream.game_id);
+      const game = await fetchTwitchGame(stream.game_id);
       if (!game) return;
 
       interaction.reply({
-        embeds: [useStreamEmbed(stream, user, game)],
+        embeds: [createStreamEmbed(stream, user, game)],
       });
     } else {
-      const followers = await useTwitchFollowers(user.id);
+      const followers = await fetchTwitchFollowers(user.id);
       if (!followers) return;
 
-      interaction.reply({ embeds: [useTwitchUserEmbed(user, followers)] });
+      interaction.reply({ embeds: [createTwitchUserEmbed(user, followers)] });
     }
   },
   cooldown: 10,

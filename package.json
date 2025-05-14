@@ -1,46 +1,53 @@
 {
   "name": "skylet-discord",
-  "module": "index.ts",
   "type": "module",
   "scripts": {
     "build": "node esbuild.config.mjs",
-    "watch": "NODE_ENV=development tsx watch src/index.ts",
+    "dev": "NODE_ENV=development tsx watch src/index.ts | pino-pretty -c",
     "start": "node dist/index.js",
-    "start:dev": "NODE_ENV=development tsx src/index.ts",
+    "start:dev": "NODE_ENV=development tsx src/index.ts | pino-pretty -c",
     "updatecmds:dev": "NODE_ENV=development tsx src/update-cmds.ts",
-    "updatecmds:prod": "NODE_ENV=production tsx src/update-cmds.ts"
+    "updatecmds:prod": "NODE_ENV=production tsx src/update-cmds.ts",
+    "deletecmds:dev": "NODE_ENV=development tsx src/delete-cmds.ts",
+    "deletecmds:prod": "NODE_ENV=production tsx src/delete-cmds.ts",
+    "db:gen": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:pull": "drizzle-kit pull"
   },
   "devDependencies": {
-    "@types/ws": "^8.5.10",
-    "@typescript-eslint/eslint-plugin": "^7.9.0",
-    "@typescript-eslint/parser": "^7.9.0",
-    "esbuild": "^0.23.0",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.3",
-    "prettier": "^3.2.5",
-    "tsx": "^4.11.0"
-  },
-  "peerDependencies": {
+    "@types/ws": "^8.18.1",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
+    "drizzle-kit": "^0.31.1",
+    "esbuild": "^0.25.4",
+    "eslint": "^9.26.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.0",
+    "pino-pretty": "^13.0.0",
+    "prettier": "^3.5.3",
+    "tsx": "^4.19.4",
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@discordjs/opus": "^0.9.0",
-    "@discordjs/rest": "^2.3.0",
-    "@discordjs/voice": "^0.17.0",
-    "@distube/youtube": "^1.0.2",
-    "axios": "^1.6.8",
-    "chalk": "^5.3.0",
-    "cron": "^3.1.7",
-    "discord.js": "^14.15.2",
-    "distube": "^5.0.2",
-    "dotenv": "^16.4.5",
-    "libsodium-wrappers": "^0.7.13",
-    "ws": "^8.17.0",
-    "zod": "^3.23.8"
+    "@discordjs/opus": "^0.10.0",
+    "@discordjs/rest": "^2.5.0",
+    "@discordjs/voice": "^0.18.0",
+    "@distube/youtube": "^1.0.4",
+    "@libsql/client": "^0.15.5",
+    "@t3-oss/env-core": "^0.13.4",
+    "cron": "^4.3.0",
+    "discord.js": "^14.19.3",
+    "distube": "^5.0.7",
+    "drizzle-orm": "^0.43.1",
+    "libsodium-wrappers": "^0.7.15",
+    "nanoid": "^5.1.5",
+    "ofetch": "^1.4.1",
+    "pino": "^9.6.0",
+    "valibot": "^1.1.0",
+    "ws": "^8.18.2"
   },
   "overrides": {
     "discord-api-types": "0.37.84"
   },
-  "packageManager": "pnpm@9.1.2+sha512.127dc83b9ea10c32be65d22a8efb4a65fb952e8fefbdfded39bdc3c97efc32d31b48b00420df2c1187ace28c921c902f0cb5a134a4d032b8b5295cbfa2c681e2"
+  "packageManager": "pnpm@10.8.0+sha512.0e82714d1b5b43c74610193cb20734897c1d00de89d0e18420aebc5977fa13d780a9cb05734624e81ebd81cc876cd464794850641c48b9544326b5622ca29971"
 }

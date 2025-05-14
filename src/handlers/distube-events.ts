@@ -3,7 +3,7 @@ import path from "path";
 
 import type { Client } from "discord.js";
 
-import { text, variable } from "@/theme";
+import { logger } from "@/logger";
 import type { DistubeEvent } from "@/types";
 
 export default (client: Client) => {
@@ -17,6 +17,6 @@ export default (client: Client) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     client.distube.on(event.name, (...args: any) => event.execute(...args));
 
-    console.log(`${text("🌠 Successfully loaded event")} ${variable(event.name)}`);
+    logger.info(`🌠 Successfully loaded event ${event.name}`);
   });
 };

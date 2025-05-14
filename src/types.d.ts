@@ -52,21 +52,6 @@ export interface DistubeEvent {
   execute: (...args) => void;
 }
 
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv {
-      TOKEN: string;
-      CLIENT_ID: string;
-      GUILD_ID: string;
-      TWITCH_CLIENT_ID: string;
-      TWITCH_CLIENT_SECRET: string;
-      MC_SERVER_IP: string;
-      SSH_KEY_PATH: string;
-      SSH_CONNECTION: string;
-    }
-  }
-}
-
 declare module "discord.js" {
   export interface Client {
     slashCommands: Collection<string, SlashCommand>;

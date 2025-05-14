@@ -1,12 +1,12 @@
 import { SlashCommandBuilder } from "discord.js";
 
-import { useQueue } from "@/functions/use-queue";
+import { getQueue } from "@/functions/get-queue";
 import type { SlashCommand } from "@/types";
 
 const command: SlashCommand = {
   command: new SlashCommandBuilder().setName("pause").setDescription("Pause the player"),
   execute(interaction) {
-    const queue = useQueue(interaction);
+    const queue = getQueue(interaction);
     if (!queue) return;
 
     if (queue.paused) {
