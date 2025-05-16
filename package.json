@@ -2,9 +2,9 @@
   "name": "skylet-discord",
   "type": "module",
   "scripts": {
-    "build": "node --env-file=.env esbuild.config.mjs",
+    "build": "node esbuild.config.mjs",
     "dev": "tsx watch --env-file=.env.local src/index.ts | pino-pretty -c",
-    "start": "node --env-file=.env dist/index.js",
+    "start": "node dist/index.js",
     "start:dev": "tsx --env-file=.env.local src/index.ts | pino-pretty -c",
     "updatecmds:dev": "tsx --env-file=.env.local src/update-cmds.ts",
     "updatecmds:prod": "tsx --env-file=.env src/update-cmds.ts",
