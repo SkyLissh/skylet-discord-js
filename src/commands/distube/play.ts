@@ -1,8 +1,8 @@
 import type { GuildMember } from "discord.js";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { z } from "zod";
 
 import type { SlashCommand } from "@/types";
+import * as v from "valibot";
 
 const command: SlashCommand = {
   command: new SlashCommandBuilder()
@@ -14,7 +14,7 @@ const command: SlashCommand = {
   execute: async (interaction) => {
     const url = interaction.options.getString("song", true);
 
-    if (z.string().url().safeParse(url).error) {
+    if (!v.safeParse(v.pipe(v.string(), v.url()), url).success) {
       interaction.reply({
         content: "Invalid URL",
         ephemeral: true,
