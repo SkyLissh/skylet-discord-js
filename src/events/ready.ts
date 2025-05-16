@@ -34,14 +34,16 @@ const event: BotEvent = {
       return !savedGuilds.some((g) => g.guildId === guild.id);
     });
 
-    await db.insert(guilds).values(
-      unsavedGuilds.map((guild) => ({
-        guildId: guild.id,
-        name: guild.name,
-      }))
-    );
+    if (unsavedGuilds.size > 0) {
+      await db.insert(guilds).values(
+        Array.from(unsavedGuilds.values()).map((guild) => ({
+          guildId: guild.id,
+          name: guild.name,
+        }))
+      ).returning();
 
-    logger.info(`Successfully synced ${savedGuilds.length} guilds`);
+      logger.info(`Successfully synced ${unsavedGuilds.size} guilds`);
+    }
   },
 };
 

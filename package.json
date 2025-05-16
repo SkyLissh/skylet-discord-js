@@ -3,20 +3,25 @@
   "type": "module",
   "scripts": {
     "build": "node --env-file=.env esbuild.config.mjs",
-    "dev": "tsx --env-file=.env.local watch src/index.ts | pino-pretty -c",
+    "dev": "tsx watch --env-file=.env.local src/index.ts | pino-pretty -c",
     "start": "node --env-file=.env dist/index.js",
     "start:dev": "tsx --env-file=.env.local src/index.ts | pino-pretty -c",
     "updatecmds:dev": "tsx --env-file=.env.local src/update-cmds.ts",
     "updatecmds:prod": "tsx --env-file=.env src/update-cmds.ts",
     "deletecmds:dev": "tsx --env-file=.env.local src/delete-cmds.ts",
     "deletecmds:prod": "tsx --env-file=.env src/delete-cmds.ts",
-    "db:gen": "drizzle-kit generate",
+    "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:pull": "drizzle-kit pull"
+    "db:pull": "drizzle-kit pull",
+    "db:generate-dev": "dotenv -e .env.local -- drizzle-kit generate",
+    "db:migrate-dev": "dotenv -e .env.local -- drizzle-kit migrate",
+    "db:pull-dev": "dotenv -e .env.local -- drizzle-kit pull"
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
+    "@types/node": "^22.15.18",
     "@types/ws": "^8.18.1",
+    "dotenv-cli": "^8.0.0",
     "drizzle-kit": "^0.31.1",
     "esbuild": "^0.25.4",
     "eslint": "^9.26.0",
