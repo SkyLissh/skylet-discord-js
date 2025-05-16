@@ -4,8 +4,6 @@ import { Routes } from "discord.js";
 import { env } from "./env";
 import { logger } from "./logger";
 
-process.loadEnvFile();
-
 const deleteCmds = async () => {
   const rest = new REST({ version: "10" }).setToken(env.DISCORD_TOKEN);
   const route =
