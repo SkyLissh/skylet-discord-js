@@ -1,4 +1,4 @@
-FROM nikolaik/python-nodejs:python3.12-nodejs20-slim as python-node-base
+FROM nikolaik/python-nodejs:python3.12-nodejs22-slim as python-node-base
 
 RUN corepack enable
 
@@ -24,7 +24,7 @@ COPY package.json pnpm-lock.yaml ./
 
 RUN pnpm install --frozen-lockfile --prod
 
-FROM node:20-slim as base
+FROM node:22-slim as base
 
 RUN corepack enable
 
