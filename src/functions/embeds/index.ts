@@ -1,2 +1,2 @@
-export * from "./use-stream-embed";
-export * from "./use-twitch-user-embed";
+export * from "./create-stream-embed";
+export * from "./create-twitch-user-embed";
