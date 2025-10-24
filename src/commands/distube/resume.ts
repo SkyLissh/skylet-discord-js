@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
 
-import { getQueue } from "@/functions/get-queue";
-import type { SlashCommand } from "@/types";
+import { getQueue } from "~/functions/get-queue";
+import type { SlashCommand } from "~/types";
 
 const command: SlashCommand = {
   command: new SlashCommandBuilder().setName("resume").setDescription("Resume the music"),
@@ -13,7 +13,7 @@ const command: SlashCommand = {
 
     interaction.reply({
       content: "Resumed the music",
-      ephemeral: true,
+      flags: "Ephemeral",
     });
   },
 };

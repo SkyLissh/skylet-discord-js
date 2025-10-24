@@ -1,6 +1,6 @@
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 
-import type { SlashCommand } from "@/types";
+import type { SlashCommand } from "~/types";
 
 const command: SlashCommand = {
   command: new SlashCommandBuilder()
@@ -20,7 +20,7 @@ const command: SlashCommand = {
           .setThumbnail(interaction.client.user.displayAvatarURL())
           .setColor("#6441A4"),
       ],
-      ephemeral: true,
+      flags: "Ephemeral",
     });
   },
 };

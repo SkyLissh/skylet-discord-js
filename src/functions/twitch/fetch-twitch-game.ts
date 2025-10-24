@@ -1,14 +1,12 @@
 import * as v from "valibot";
 
-import { fetchTwitch } from "./fetch-twitch";
+import { twitch } from "./fetch-twitch";
 
-import { TwitchGame } from "@/schemas/twitch/twitch-game";
-import { paginatedTwitchResponse } from "@/schemas/twitch/twitch-response";
+import { TwitchGame } from "~/schemas/twitch/twitch-game";
+import { paginatedTwitchResponse } from "~/schemas/twitch/twitch-response";
 
 export const fetchTwitchGame = async (id: number) => {
-  const res = await fetchTwitch("/games", {
-    query: { id },
-  });
+  const res = await twitch.get("games", { searchParams: { id } }).json();
 
   const games = v.parse(paginatedTwitchResponse(TwitchGame), res);
 

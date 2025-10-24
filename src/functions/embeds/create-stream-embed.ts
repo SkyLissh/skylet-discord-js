@@ -1,8 +1,8 @@
 import { EmbedBuilder } from "discord.js";
 
-import type { TwitchGame } from "@/schemas/twitch/twitch-game";
-import type { TwitchStream } from "@/schemas/twitch/twitch-stream";
-import type { TwitchUser } from "@/schemas/twitch/twitch-user";
+import type { TwitchGame } from "~/schemas/twitch/twitch-game";
+import type { TwitchStream } from "~/schemas/twitch/twitch-stream";
+import type { TwitchUser } from "~/schemas/twitch/twitch-user";
 
 export const createStreamEmbed = (
   stream: TwitchStream,

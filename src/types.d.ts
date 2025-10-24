@@ -1,9 +1,11 @@
 import type {
   AutocompleteInteraction,
+  CacheType,
   ChatInputCommandInteraction,
   Client,
   Collection,
   Message,
+  ModalSubmitInteraction,
   PermissionResolvable,
   SharedSlashCommand,
 } from "discord.js";

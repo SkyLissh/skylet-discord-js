@@ -8,7 +8,10 @@ export const env = createEnv({
     DISCORD_GUILD_ID: v.string(),
     TWITCH_CLIENT_ID: v.string(),
     TWITCH_CLIENT_SECRET: v.string(),
-    NODE_ENV: v.union([v.literal("development"), v.literal("production")]),
+    NODE_ENV: v.optional(
+      v.union([v.literal("development"), v.literal("production")]),
+      "development"
+    ),
     TURSO_DATABASE_URL: v.string(),
     TURSO_AUTH_TOKEN: v.string(),
   },

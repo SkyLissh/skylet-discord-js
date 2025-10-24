@@ -1,14 +1,12 @@
 import * as v from "valibot";
 
-import { fetchTwitch } from "./fetch-twitch";
+import { twitch } from "./fetch-twitch";
 
-import { paginatedTwitchResponse } from "@/schemas/twitch/twitch-response";
-import { TwitchStream } from "@/schemas/twitch/twitch-stream";
+import { paginatedTwitchResponse } from "~/schemas/twitch/twitch-response";
+import { TwitchStream } from "~/schemas/twitch/twitch-stream";
 
 export const fetchTwitchStream = async (user: string) => {
-  const res = await fetchTwitch("/streams", {
-    query: { user_login: user },
-  });
+  const res = await twitch.get("streams", { searchParams: { user_login: user } }).json();
 
   const streams = v.parse(paginatedTwitchResponse(TwitchStream), res);
 

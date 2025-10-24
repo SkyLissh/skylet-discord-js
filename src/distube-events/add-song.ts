@@ -1,4 +1,4 @@
-import type { DistubeEvent } from "@/types";
+import type { DistubeEvent } from "~/types";
 import { EmbedBuilder } from "discord.js";
 import type { Queue, Song } from "distube";
 import { Events } from "distube";

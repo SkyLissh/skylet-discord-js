@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
 
-import { getQueue } from "@/functions/get-queue";
-import type { SlashCommand } from "@/types";
+import { getQueue } from "~/functions/get-queue";
+import type { SlashCommand } from "~/types";
 
 const command: SlashCommand = {
   command: new SlashCommandBuilder().setName("pause").setDescription("Pause the player"),
@@ -11,17 +11,16 @@ const command: SlashCommand = {
 
     if (queue.paused) {
       queue.resume();
-
-      interaction.reply({
+      return interaction.reply({
         content: ":play_button: Player resumed",
-        ephemeral: true,
+        flags: "Ephemeral",
       });
     }
 
     queue.pause();
-    interaction.reply({
+    return interaction.reply({
       content: ":pause_button: Paused the player",
-      ephemeral: true,
+      flags: "Ephemeral",
     });
   },
 };

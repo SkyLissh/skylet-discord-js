@@ -39,7 +39,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY . .
 
-RUN ["pnpm", "run", "watch"]
+CMD ["pnpm", "run", "dev"]
 
 FROM base as production
 

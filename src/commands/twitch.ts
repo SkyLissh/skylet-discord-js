@@ -1,15 +1,15 @@
 import { SlashCommandBuilder } from "discord.js";
 
-import type { SlashCommand } from "@/types";
+import type { SlashCommand } from "~/types";
 
-import { createStreamEmbed } from "@/functions/embeds/create-stream-embed";
-import { createTwitchUserEmbed } from "@/functions/embeds/create-twitch-user-embed";
+import { createStreamEmbed } from "~/functions/embeds/create-stream-embed";
+import { createTwitchUserEmbed } from "~/functions/embeds/create-twitch-user-embed";
 import {
   fetchTwitchFollowers,
   fetchTwitchGame,
   fetchTwitchStream,
   fetchTwitchUser,
-} from "@/functions/twitch";
+} from "~/functions/twitch";
 
 const command: SlashCommand = {
   command: new SlashCommandBuilder()
@@ -19,8 +19,8 @@ const command: SlashCommand = {
       option
         .setName("user")
         .setDescription("Twitch username")
-        .setMinLength(25)
         .setMinLength(4)
+        .setMaxLength(25)
         .setRequired(true)
     ),
   execute: async (interaction) => {

@@ -1,8 +1,8 @@
 import type { GuildMember } from "discord.js";
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 
-import type { SlashCommand } from "@/types";
 import * as v from "valibot";
+import type { SlashCommand } from "~/types";
 
 const command: SlashCommand = {
   command: new SlashCommandBuilder()
@@ -17,7 +17,7 @@ const command: SlashCommand = {
     if (!v.safeParse(v.pipe(v.string(), v.url()), url).success) {
       interaction.reply({
         content: "Invalid URL",
-        ephemeral: true,
+        flags: "Ephemeral",
       });
       return;
     }
@@ -27,7 +27,7 @@ const command: SlashCommand = {
     if (!channel || !channel.isVoiceBased()) return;
 
     await interaction.client.distube.play(channel, url);
-    const queue = await interaction.client.distube.getQueue(channel);
+    const queue = interaction.client.distube.getQueue(channel);
     if (!queue) return;
 
     const song = queue.songs.at(-1);

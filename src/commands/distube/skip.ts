@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
 
-import { getQueue } from "@/functions/get-queue";
-import type { SlashCommand } from "@/types";
+import { getQueue } from "~/functions/get-queue";
+import type { SlashCommand } from "~/types";
 
 const command: SlashCommand = {
   command: new SlashCommandBuilder()
@@ -15,7 +15,7 @@ const command: SlashCommand = {
 
     interaction.reply({
       content: "Skipped the current song",
-      ephemeral: true,
+      flags: "Ephemeral",
     });
   },
 };

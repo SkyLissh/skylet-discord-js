@@ -1,3 +1,4 @@
+import { generateDependencyReport } from "@discordjs/voice";
 import { YouTubePlugin } from "@distube/youtube";
 import { Client, Collection, GatewayIntentBits } from "discord.js";
 import { DisTube } from "distube";
@@ -15,4 +16,5 @@ client.distube = new DisTube(client, {
   plugins: [new YouTubePlugin()],
 });
 
+console.log(generateDependencyReport());
 export { client };

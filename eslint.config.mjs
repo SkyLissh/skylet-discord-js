@@ -15,8 +15,6 @@ export default tseslint.config(
       },
     },
     rules: {
-      "@typescript-eslint/consistent-type-exports": "warn",
-      "@typescript-eslint/consistent-type-imports": "warn",
       "@typescript-eslint/no-unused-vars": [
         "error",
         {
@@ -29,6 +27,13 @@ export default tseslint.config(
           ignoreRestSiblings: true,
         },
       ],
+    },
+  },
+  {
+    files: ["**/*.ts"],
+    rules: {
+      "@typescript-eslint/consistent-type-exports": "warn",
+      "@typescript-eslint/consistent-type-imports": "warn",
     },
   }
 );
