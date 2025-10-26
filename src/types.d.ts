@@ -9,7 +9,7 @@ import type {
   PermissionResolvable,
   SharedSlashCommand,
 } from "discord.js";
-import type { DisTube, DisTubeEvents } from "distube";
+import type { Melodi } from "./melodi";
 
 export interface SlashCommand {
   command: SharedSlashCommand;
@@ -49,17 +49,12 @@ export interface BotEvent {
   execute: (...args) => void;
 }
 
-export interface DistubeEvent {
-  name: keyof DisTubeEvents;
-  execute: (...args) => void;
-}
-
 declare module "discord.js" {
   export interface Client {
     slashCommands: Collection<string, SlashCommand>;
     commands: Collection<string, Command>;
     cooldowns: Collection<string, number>;
     tasks: Collection<string, Task>;
-    distube: DisTube;
+    melodi: Melodi;
   }
 }

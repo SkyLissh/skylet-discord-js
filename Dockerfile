@@ -48,4 +48,6 @@ COPY --from=builder /prod/node_modules ./node_modules
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
+RUN pnpm updatecmds:prod
+
 CMD ["pnpm", "start"]

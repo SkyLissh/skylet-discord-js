@@ -1,7 +1,5 @@
-import { generateDependencyReport } from "@discordjs/voice";
-import { YouTubePlugin } from "@distube/youtube";
 import { Client, Collection, GatewayIntentBits } from "discord.js";
-import { DisTube } from "distube";
+import { Melodi } from "~/melodi";
 
 const { Guilds, MessageContent, GuildMessages, GuildVoiceStates } = GatewayIntentBits;
 const client = new Client({
@@ -11,10 +9,6 @@ const client = new Client({
 client.slashCommands = new Collection();
 client.cooldowns = new Collection();
 client.tasks = new Collection();
-client.distube = new DisTube(client, {
-  emitNewSongOnly: true,
-  plugins: [new YouTubePlugin()],
-});
+client.melodi = await Melodi.create(client);
 
-console.log(generateDependencyReport());
 export { client };
