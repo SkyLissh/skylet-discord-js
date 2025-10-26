@@ -1,7 +1,7 @@
 import { EmbedBuilder } from "discord.js";
 
-import { formatNumber } from "@/functions/format-number";
-import type { TwitchUser } from "@/schemas/twitch/twitch-user";
+import { formatNumber } from "~/functions/format-number";
+import type { TwitchUser } from "~/schemas/twitch/twitch-user";
 
 export const createTwitchUserEmbed = (user: TwitchUser, followers: number) => {
   return new EmbedBuilder()

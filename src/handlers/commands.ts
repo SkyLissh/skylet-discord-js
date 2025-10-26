@@ -1,22 +1,25 @@
-import fs from "fs";
+import { globby } from "globby";
 import path from "path";
+import { pathToFileURL } from "url";
 
 import type { Client } from "discord.js";
 
-import { logger } from "@/logger";
-import type { SlashCommand } from "@/types";
+import { logger } from "~/logger";
+import type { SlashCommand } from "~/types";
 
 export default async (client: Client) => {
   const slashCmdsDir = path.join(import.meta.dirname, "../commands");
 
-  const files = await fs.promises.readdir(slashCmdsDir, { recursive: true });
+  const files = await globby(["**/*.{ts,js}"], {
+    cwd: slashCmdsDir,
+    absolute: true,
+    gitignore: true,
+    ignore: ["**/subcommands/**", "**/*.d.ts"],
+  });
 
   for (const file of files) {
-    if (!file.endsWith(".ts")) continue;
-    if (file.includes("subcommands")) continue;
-
     const { default: cmd }: { default: SlashCommand } = await import(
-      `${slashCmdsDir}/${file}`
+      pathToFileURL(file).href
     );
     client.slashCommands.set(cmd.command.name, cmd);
   }

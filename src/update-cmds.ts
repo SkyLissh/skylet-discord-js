@@ -1,27 +1,29 @@
-import fs from "fs";
+import { globby } from "globby";
 import path from "path";
+import { pathToFileURL } from "url";
 
 import { REST } from "@discordjs/rest";
 import type { SharedSlashCommand } from "discord.js";
 import { Routes } from "discord.js";
 
-import type { SlashCommand } from "@/types";
+import type { SlashCommand } from "~/types";
 import { env } from "./env";
 import { logger } from "./logger";
 
 const update = async () => {
   const commands: SharedSlashCommand[] = [];
 
-  const files = await fs.promises.readdir(path.join(import.meta.dirname, "./commands"), {
-    recursive: true,
+  const commandsDir = path.join(import.meta.dirname, "./commands");
+  const files = await globby(["**/*.{ts,js}"], {
+    cwd: commandsDir,
+    absolute: true,
+    gitignore: true,
+    ignore: ["**/subcommands/**", "**/*.d.ts"],
   });
 
   for (const file of files) {
-    if (!file.endsWith(".ts")) continue;
-    if (file.includes("subcommands")) continue;
-
     const { default: cmd }: { default: SlashCommand } = await import(
-      `./commands/${file}`
+      pathToFileURL(file).href
     );
     commands.push(cmd.command);
   }

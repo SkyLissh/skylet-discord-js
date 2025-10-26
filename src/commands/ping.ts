@@ -1,6 +1,6 @@
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 
-import type { SlashCommand } from "@/types";
+import type { SlashCommand } from "~/types";
 
 const command: SlashCommand = {
   command: new SlashCommandBuilder().setName("ping").setDescription("Replies with Pong!"),

@@ -1,6 +1,6 @@
 import * as v from "valibot";
 
-import { formatNumber } from "@/functions/format-number";
+import { formatNumber } from "~/functions/format-number";
 
 export const TwitchStream = v.object({
   id: v.pipe(v.string(), v.transform(Number)),

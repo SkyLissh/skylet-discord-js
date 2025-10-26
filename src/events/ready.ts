@@ -3,11 +3,11 @@ import { Events } from "discord.js";
 
 import { CronJob } from "cron";
 
-import { logger } from "@/logger";
-import type { BotEvent } from "@/types";
+import { logger } from "~/logger";
+import type { BotEvent } from "~/types";
 
-import { db } from "@/db";
-import { guilds } from "@/db/schema/guilds";
+import { db } from "~/db";
+import { guilds } from "~/db/schema/guilds";
 
 const event: BotEvent = {
   name: Events.ClientReady,
@@ -19,9 +19,7 @@ const event: BotEvent = {
       CronJob.from({
         cronTime: task.cronTime,
         context: client,
-        onTick: function () {
-          task.execute(this);
-        },
+        onTick: () => task.execute(client as unknown as Client),
         start: true,
       });
 
@@ -35,12 +33,15 @@ const event: BotEvent = {
     });
 
     if (unsavedGuilds.size > 0) {
-      await db.insert(guilds).values(
-        Array.from(unsavedGuilds.values()).map((guild) => ({
-          guildId: guild.id,
-          name: guild.name,
-        }))
-      ).returning();
+      await db
+        .insert(guilds)
+        .values(
+          Array.from(unsavedGuilds.values()).map((guild) => ({
+            guildId: guild.id,
+            name: guild.name,
+          }))
+        )
+        .returning();
 
       logger.info(`Successfully synced ${unsavedGuilds.size} guilds`);
     }

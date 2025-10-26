@@ -7,7 +7,7 @@ export function getQueue(interaction: ChatInputCommandInteraction): Queue | unde
 
   interaction.reply({
     content: "There is nothing in the queue right now.",
-    ephemeral: true,
+    flags: "Ephemeral",
   });
 
   return undefined;
