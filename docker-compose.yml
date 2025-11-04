@@ -11,6 +11,6 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    command: pnpm run watch
+    command: pnpm run dev
     env_file:
       - .env

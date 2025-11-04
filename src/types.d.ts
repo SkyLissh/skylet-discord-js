@@ -1,13 +1,15 @@
 import type {
   AutocompleteInteraction,
+  CacheType,
   ChatInputCommandInteraction,
   Client,
   Collection,
   Message,
+  ModalSubmitInteraction,
   PermissionResolvable,
   SharedSlashCommand,
 } from "discord.js";
-import type { DisTube, DisTubeEvents } from "distube";
+import type { Melodi } from "./melodi";
 
 export interface SlashCommand {
   command: SharedSlashCommand;
@@ -47,9 +49,9 @@ export interface BotEvent {
   execute: (...args) => void;
 }
 
-export interface DistubeEvent {
-  name: keyof DisTubeEvents;
-  execute: (...args) => void;
+export interface MelodiEvent {
+  name: string;
+  execute: (client: Client, ...args) => void;
 }
 
 declare module "discord.js" {
@@ -58,6 +60,6 @@ declare module "discord.js" {
     commands: Collection<string, Command>;
     cooldowns: Collection<string, number>;
     tasks: Collection<string, Task>;
-    distube: DisTube;
+    melodi: Melodi;
   }
 }
