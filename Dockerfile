@@ -6,11 +6,15 @@ FROM python-node-base as builder
 
 RUN apt update && apt upgrade -y && apt install --no-install-recommends -y \
   build-essential \
-  ffmpeg
+  ffmpeg \
+  pkg-config \
+  libopus-dev
 
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+ENV OPUS_SYSTEM=1
 
 RUN pnpm install --frozen-lockfile
 
