@@ -14,7 +14,7 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-RUN OPUS_SYSTEM=1 npm_config_cxxflags="-DOPUS_DISABLE_INTRINSICS" pnpm install --frozen-lockfile
+RUN OPUS_SYSTEM=1 npm_config_cflags="-DOPUS_DISABLE_INTRINSICS" pnpm install --frozen-lockfile
 
 COPY . .
 
