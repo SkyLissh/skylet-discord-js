@@ -27,6 +27,8 @@ const event: BotEvent = {
       })
       .returning();
 
+    if (!inserted) return;
+
     logger.info(`Guild ${inserted.name} (${inserted.guildId}) added to database`);
   },
 };

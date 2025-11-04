@@ -25,29 +25,27 @@ const command: SlashCommand = {
     try {
       const song = await interaction.client.melodi.play(channel, query);
 
-      const channelId = song.channel_id;
-      const channelUrl = channelId
-        ? `https://www.youtube.com/channel/${channelId}`
-        : undefined;
-      const thumbnailUrl = song.thumbnail?.[0]?.url;
-      const duration = song.duration || 0;
-
-      const embed = new EmbedBuilder()
-        .setColor("#e30026")
-        .setAuthor({
-          name: song.author || "Unknown",
-          url: channelUrl,
-        })
-        .setTitle(`Playing ${song.title}`)
-        .setURL(song.url_canonical)
-        .setFooter({ text: `Duration: ${format(new Date(duration * 1000), "mm:ss")}` });
-
-      if (thumbnailUrl) {
-        embed.setImage(thumbnailUrl);
+      if (Array.isArray(song)) {
+        return interaction.reply({
+          embeds: [
+            new EmbedBuilder()
+              .setColor("#e30026")
+              .setDescription(`📝 Added to queue: ${song.length} songs`),
+          ],
+        });
       }
 
+      const duration = song.duration || 0;
+      const formattedDuration = format(new Date(duration * 1000), "mm:ss");
+
       interaction.reply({
-        embeds: [embed],
+        embeds: [
+          new EmbedBuilder()
+            .setColor("#e30026")
+            .setDescription(
+              `📝 Added to queue: **[${song.author} - ${song.title}](${song.url_canonical})** |  \`${formattedDuration}\``
+            ),
+        ],
       });
     } catch (error) {
       if (error instanceof InvalidUrl) {

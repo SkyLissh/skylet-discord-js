@@ -49,6 +49,11 @@ export interface BotEvent {
   execute: (...args) => void;
 }
 
+export interface MelodiEvent {
+  name: string;
+  execute: (client: Client, ...args) => void;
+}
+
 declare module "discord.js" {
   export interface Client {
     slashCommands: Collection<string, SlashCommand>;
