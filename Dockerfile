@@ -14,8 +14,7 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-RUN OPUS_SYSTEM=1 pnpm install --frozen-lockfile --build-from-source \
-  --opus_cflags="-DOPUS_ARM_MAY_HAVE_NEON=1 -march=armv8-a+simd"
+RUN OPUS_SYSTEM=1 npm_config_cxxflags="-DOPUS_DISABLE_INTRINSICS" pnpm install --frozen-lockfile
 
 COPY . .
 
