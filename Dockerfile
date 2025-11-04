@@ -14,9 +14,7 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-ENV OPUS_SYSTEM=1
-
-RUN pnpm install --frozen-lockfile
+RUN OPUS_SYSTEM=1 pnpm install --frozen-lockfile
 
 COPY . .
 
