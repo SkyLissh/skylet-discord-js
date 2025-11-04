@@ -1,12 +1,12 @@
+import EventEmitter from "node:events";
 import { Readable } from "node:stream";
 
 import {
-  AudioPlayerStatus,
-  createAudioPlayer,
   createAudioResource,
   entersState,
   getVoiceConnection,
   joinVoiceChannel,
+  VoiceConnection,
   VoiceConnectionStatus,
 } from "@discordjs/voice";
 import type { Client, GuildResolvable, VoiceBasedChannel } from "discord.js";
@@ -17,6 +17,9 @@ import * as v from "valibot";
 
 import { parseYouTubeURL } from "~/functions/parse-youtube-url";
 import { InvalidUrl, NoResultsFound, PlaylistNotSupported } from "./errors";
+
+import { VideoInfo } from "~/schemas/youtube/video_info";
+import { Queue } from "./queue";
 
 Platform.shim.eval = async (
   data: Types.BuildScriptResult,
@@ -37,9 +40,31 @@ Platform.shim.eval = async (
   return new Function(code)();
 };
 
-export class Melodi {
+/**
+ * Melodi is a Discord music player that manages audio playback across multiple guilds.
+ * 
+ * It integrates Discord.js voice connections with YouTube Music streaming via the Innertube API.
+ * Melodi handles:
+ * - Per-guild song queues with independent playback control
+ * - Song resolution from YouTube URLs or search queries
+ * - Voice channel joining/leaving and connection management
+ * - Playback control (play, pause, resume, stop, skip)
+ * - Event forwarding from queues to listeners with guild context
+ * 
+ * Each guild maintains its own queue instance, allowing simultaneous playback
+ * across multiple servers. The class acts as a facade, delegating queue management
+ * to Queue instances and audio streaming to the Innertube API.
+ * 
+ * @emits songAdded - Emitted when a song is added to a guild's queue
+ * @emits songStarted - Emitted when a song starts playing in a guild
+ * @emits songFinished - Emitted when a song finishes playing in a guild
+ * @emits queueEmpty - Emitted when a guild's queue becomes empty
+ */
+export class Melodi extends EventEmitter {
   client: Client;
   yt: Innertube;
+
+  #queues = new Map<string, Queue>();
 
   /**
    * Creates a Melodi instance bound to the provided Discord client and YouTube integration.
@@ -47,8 +72,63 @@ export class Melodi {
    * @param yt YouTube Innertube client used for music search and streaming.
    */
   constructor(client: Client, yt: Innertube) {
+    super();
     this.client = client;
     this.yt = yt;
+  }
+
+  /**
+   * Retrieves the queue for the specified guild ID.
+   * @param guildId ID of the guild to retrieve the queue for.
+   * @returns The queue for the specified guild ID, or undefined if it doesn't exist.
+   */
+  getQueue(guildId: string): Queue | undefined {
+    return this.#queues.get(guildId);
+  }
+
+  /**
+   * Creates a new queue for the specified guild ID and voice connection.
+   * @param guildId ID of the guild to create the queue for.
+   * @param connection Voice connection to associate with the queue.
+   * @returns The newly created queue.
+   */
+  #createQueue(guildId: string, connection: VoiceConnection): Queue {
+    let queue = this.getQueue(guildId);
+
+    if (queue) return queue;
+
+    queue = new Queue(connection);
+    this.#queues.set(guildId, queue);
+
+    // Forward queue events to Melodi instance
+    queue.on("songAdded", (song: VideoInfo) => {
+      this.emit("songAdded", guildId, song);
+    });
+
+    queue.on("songStarted", (song: VideoInfo) => {
+      this.emit("songStarted", guildId, song);
+    });
+
+    queue.on("songFinished", (song: VideoInfo) => {
+      this.emit("songFinished", guildId, song);
+    });
+
+    queue.on("queueEmpty", () => {
+      this.emit("queueEmpty", guildId);
+    });
+
+    queue.on("playNext", async (song: VideoInfo) => {
+      try {
+        const videoInfo = await this.yt.music.getInfo(song.id!);
+        const stream = await videoInfo.download({ type: "audio" });
+        const resource = createAudioResource(Readable.from(stream));
+        queue.play(resource);
+      } catch (error) {
+        queue.skip();
+      }
+    });
+
+    return queue;
   }
 
   /**
@@ -68,7 +148,7 @@ export class Melodi {
    * @throws {PlaylistNotSupported} When the URL points to a playlist.
    * @returns The YouTube video ID.
    */
-  #getIdFromUrl(url: string) {
+  async #getIdFromUrl(url: string) {
     // Parse YouTube URL to extract ID and type
     const urlResult = parseYouTubeURL(url);
     if (!urlResult) {
@@ -77,9 +157,18 @@ export class Melodi {
 
     const { id, type } = urlResult;
 
-    // TODO: Implement playlist support
     if (type === "playlist") {
-      throw new PlaylistNotSupported();
+      const playlist = await this.yt.music.getPlaylist(id);
+      const videos = playlist.contents;
+      if (!videos) return;
+
+      return videos
+        .map((video) => {
+          if (!video.is(YTNodes.MusicResponsiveListItem)) return;
+
+          return video.id;
+        })
+        .filter((id): id is string => id !== undefined);
     }
 
     return id;
@@ -128,9 +217,15 @@ export class Melodi {
     if (!guildId) return;
 
     const connection = getVoiceConnection(guildId);
-    if (!connection) return;
+    if (connection) {
+      connection.destroy();
+    }
 
-    connection.destroy();
+    const queue = this.#queues.get(guildId);
+    if (!queue) return;
+
+    queue.leave();
+    this.#queues.delete(guildId);
   }
 
   /**
@@ -144,7 +239,9 @@ export class Melodi {
       v.pipe(
         v.string(),
         v.url(),
-        v.regex(/^(https?:\/\/)?(www\.)?youtube\.com\/watch\?v=/)
+        v.regex(
+          /^(https?:\/\/)?(www\.|music\.)?youtube\.com\/(watch\?v=|playlist\?list=)|^(https?:\/\/)?youtu\.be\//
+        )
       ),
       song
     );
@@ -158,18 +255,29 @@ export class Melodi {
       throw error instanceof Error ? error : new Error("Failed to join voice channel");
     }
 
-    const videoId = isUrl ? this.#getIdFromUrl(url) : await this.#getIdFromSearch(song);
-    const videoInfo = await this.yt.music.getInfo(videoId);
+    const videoId = isUrl
+      ? await this.#getIdFromUrl(url)
+      : await this.#getIdFromSearch(song);
 
-    const stream = await videoInfo.download({ type: "audio" });
+    if (!videoId) {
+      throw new Error("Failed to resolve video ID");
+    }
 
-    const player = createAudioPlayer();
-    const resource = createAudioResource(Readable.from(stream));
+    if (Array.isArray(videoId)) {
+      const videos = await Promise.all(videoId.map((id) => this.yt.music.getInfo(id)));
 
-    connection.subscribe(player);
-    player.play(resource);
+      const queue = this.#createQueue(channel.guild.id, connection);
 
-    return videoInfo.basic_info;
+      const songs = videos.map((video) => video.basic_info as VideoInfo);
+      queue.add(songs);
+      return songs;
+    } else {
+      const videoInfo = await this.yt.music.getInfo(videoId);
+
+      const queue = this.#createQueue(channel.guild.id, connection);
+      queue.add(videoInfo.basic_info as VideoInfo);
+      return videoInfo.basic_info;
+    }
   }
 
   /**
@@ -180,24 +288,7 @@ export class Melodi {
     const guildId = this.client.guilds.resolveId(guild);
     if (!guildId) return;
 
-    const connection = getVoiceConnection(guildId);
-    if (!connection) return;
-
-    const state = connection.state;
-
-    if (state.status !== VoiceConnectionStatus.Ready) return;
-
-    const player = state.subscription?.player;
-    if (!player) return;
-
-    if (player.state.status === AudioPlayerStatus.Playing) {
-      player.pause();
-      return;
-    }
-
-    if (player.state.status === AudioPlayerStatus.Paused) {
-      player.unpause();
-    }
+    this.#queues.get(guildId)?.pause();
   }
 
   /**
@@ -208,21 +299,7 @@ export class Melodi {
     const guildId = this.client.guilds.resolveId(guild);
     if (!guildId) return;
 
-    const connection = getVoiceConnection(guildId);
-    if (!connection) return;
-
-    const state = connection.state;
-
-    if (state.status !== VoiceConnectionStatus.Ready) return;
-
-    const player = state.subscription?.player;
-    if (!player) return;
-
-    if (player.state.status === AudioPlayerStatus.Playing) return;
-
-    if (player.state.status !== AudioPlayerStatus.Paused) return;
-
-    player.unpause();
+    this.#queues.get(guildId)?.resume();
   }
 
   /**
@@ -233,16 +310,17 @@ export class Melodi {
     const guildId = this.client.guilds.resolveId(guild);
     if (!guildId) return;
 
-    const connection = getVoiceConnection(guildId);
-    if (!connection) return;
+    this.#queues.get(guildId)?.stop();
+  }
 
-    const state = connection.state;
+  /**
+   * Skips the currently playing song and plays the next one in the queue.
+   * @param guild Guild identifier or resolvable value.
+   */
+  skip(guild: GuildResolvable) {
+    const guildId = this.client.guilds.resolveId(guild);
+    if (!guildId) return;
 
-    if (state.status !== VoiceConnectionStatus.Ready) return;
-
-    const player = state.subscription?.player;
-    if (!player) return;
-
-    player.stop();
+    this.#queues.get(guildId)?.skip();
   }
 }

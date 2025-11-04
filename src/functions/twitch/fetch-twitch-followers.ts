@@ -7,7 +7,7 @@ import { paginatedTwitchResponse } from "~/schemas/twitch/twitch-response";
 
 export const fetchTwitchFollowers = async (id: number) => {
   const res = await twitch
-    .get("/channels/followers", {
+    .get("channels/followers", {
       searchParams: { broadcaster_id: id, first: 1 },
     })
     .json();
