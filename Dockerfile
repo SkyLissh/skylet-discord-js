@@ -14,7 +14,8 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-RUN OPUS_SYSTEM=1 pnpm install --frozen-lockfile
+RUN OPUS_SYSTEM=1 pnpm install --frozen-lockfile --build-from-source \
+  --opus_cflags="-DOPUS_ARM_MAY_HAVE_NEON=1 -march=armv8-a+simd"
 
 COPY . .
 
@@ -24,8 +25,7 @@ WORKDIR /prod
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-RUN pnpm install --frozen-lockfile --prod --build-from-source \
-  --opus_cflags="-DOPUS_ARM_MAY_HAVE_NEON=1 -march=armv8-a+simd"
+RUN pnpm install --frozen-lockfile --prod
 
 FROM node:24-slim as base
 
