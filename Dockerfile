@@ -45,3 +45,5 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /prod/node_modules ./node_modules
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+CMD [ "node", "dist/index.js" ]
