@@ -26,19 +26,21 @@ const command: SlashCommand = {
       const song = await interaction.client.melodi.play(channel, query);
 
       if (Array.isArray(song)) {
-        return interaction.reply({
+        await interaction.reply({
           embeds: [
             new EmbedBuilder()
               .setColor("#e30026")
               .setDescription(`📝 Added to queue: ${song.length} songs`),
           ],
         });
+
+        return;
       }
 
       const duration = song.duration || 0;
       const formattedDuration = format(new Date(duration * 1000), "mm:ss");
 
-      interaction.reply({
+      await interaction.reply({
         embeds: [
           new EmbedBuilder()
             .setColor("#e30026")
@@ -49,23 +51,23 @@ const command: SlashCommand = {
       });
     } catch (error) {
       if (error instanceof InvalidUrl) {
-        interaction.reply({
+        await interaction.reply({
           content: "Invalid URL",
           flags: "Ephemeral",
         });
       } else if (error instanceof NoResultsFound) {
-        interaction.reply({
+        await interaction.reply({
           content: "No results found",
           flags: "Ephemeral",
         });
       } else if (error instanceof PlaylistNotSupported) {
-        interaction.reply({
+        await interaction.reply({
           content: "Playlist not supported",
           flags: "Ephemeral",
         });
       } else {
         logger.error(error);
-        interaction.reply({
+        await interaction.reply({
           content: "An error occurred while playing the song",
           flags: "Ephemeral",
         });

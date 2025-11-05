@@ -12,7 +12,7 @@ const command: SlashCommand = {
     const channel = member.voice.channel;
 
     if (!channel || !channel.isVoiceBased()) {
-      interaction.reply({
+      await interaction.reply({
         content: "You need to be in a voice channel to skip songs!",
         flags: "Ephemeral",
       });
@@ -22,7 +22,7 @@ const command: SlashCommand = {
     const queue = interaction.client.melodi.getQueue(interaction.guildId!);
 
     if (!queue) {
-      interaction.reply({
+      await interaction.reply({
         content: "There is no song playing right now!",
         flags: "Ephemeral",
       });
@@ -31,7 +31,7 @@ const command: SlashCommand = {
 
     interaction.client.melodi.skip(interaction.guildId!);
 
-    interaction.reply({
+    await interaction.reply({
       content: "⏭️ Skipped the current song!",
     });
   },

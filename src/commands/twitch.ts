@@ -34,14 +34,14 @@ const command: SlashCommand = {
       const game = await fetchTwitchGame(stream.game_id);
       if (!game) return;
 
-      interaction.reply({
+      await interaction.reply({
         embeds: [createStreamEmbed(stream, user, game)],
       });
     } else {
       const followers = await fetchTwitchFollowers(user.id);
       if (!followers) return;
 
-      interaction.reply({ embeds: [createTwitchUserEmbed(user, followers)] });
+      await interaction.reply({ embeds: [createTwitchUserEmbed(user, followers)] });
     }
   },
   cooldown: 10,

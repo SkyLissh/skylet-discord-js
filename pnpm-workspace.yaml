@@ -1,4 +1,4 @@
 onlyBuiltDependencies:
-  - '@discordjs/opus'
+  - "@discordjs/opus"
   - canvas
   - esbuild

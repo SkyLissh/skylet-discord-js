@@ -4,10 +4,10 @@ import type { SlashCommand } from "~/types";
 
 const command: SlashCommand = {
   command: new SlashCommandBuilder().setName("pause").setDescription("Pause the player"),
-  execute(interaction) {
+  execute: async (interaction) => {
     interaction.client.melodi.pause(interaction.guild!);
 
-    return interaction.reply({
+    await interaction.reply({
       content: ":pause_button: Paused the player",
       flags: "Ephemeral",
     });

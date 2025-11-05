@@ -40,7 +40,7 @@ export const twitch = ky.create({
           const { success, output, issues } = v.safeParse(TwitchTokenSchema, res);
 
           if (!success) {
-            logger.error(`❌ Failed to fetch Twitch token. Error: ${issues}`);
+            logger.error(`❌ Failed to fetch Twitch token. Error: ${v.summarize(issues)}`);
             token = undefined;
 
             return;

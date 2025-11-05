@@ -1,12 +1,12 @@
 import EventEmitter from "node:events";
 import { Readable } from "node:stream";
 
+import type { VoiceConnection } from "@discordjs/voice";
 import {
   createAudioResource,
   entersState,
   getVoiceConnection,
   joinVoiceChannel,
-  VoiceConnection,
   VoiceConnectionStatus,
 } from "@discordjs/voice";
 import type { Client, GuildResolvable, VoiceBasedChannel } from "discord.js";
@@ -16,15 +16,15 @@ import { Innertube, Platform, YTNodes, type Types } from "youtubei.js";
 import * as v from "valibot";
 
 import { parseYouTubeURL } from "~/functions/parse-youtube-url";
-import { InvalidUrl, NoResultsFound, PlaylistNotSupported } from "./errors";
+import { InvalidUrl, NoResultsFound } from "./errors";
 
-import { VideoInfo } from "~/schemas/youtube/video_info";
+import type { VideoInfo } from "~/schemas/youtube/video_info";
 import { Queue } from "./queue";
 
-Platform.shim.eval = async (
+Platform.shim.eval = (
   data: Types.BuildScriptResult,
   env: Record<string, Types.VMPrimative>
-) => {
+): Record<string, string> => {
   const properties = [];
 
   if (env.n) {
@@ -37,12 +37,13 @@ Platform.shim.eval = async (
 
   const code = `${data.output}\nreturn { ${properties.join(", ")} }`;
 
+  // eslint-disable-next-line @typescript-eslint/no-implied-eval, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
   return new Function(code)();
 };
 
 /**
  * Melodi is a Discord music player that manages audio playback across multiple guilds.
- * 
+ *
  * It integrates Discord.js voice connections with YouTube Music streaming via the Innertube API.
  * Melodi handles:
  * - Per-guild song queues with independent playback control
@@ -50,11 +51,11 @@ Platform.shim.eval = async (
  * - Voice channel joining/leaving and connection management
  * - Playback control (play, pause, resume, stop, skip)
  * - Event forwarding from queues to listeners with guild context
- * 
+ *
  * Each guild maintains its own queue instance, allowing simultaneous playback
  * across multiple servers. The class acts as a facade, delegating queue management
  * to Queue instances and audio streaming to the Innertube API.
- * 
+ *
  * @emits songAdded - Emitted when a song is added to a guild's queue
  * @emits songStarted - Emitted when a song starts playing in a guild
  * @emits songFinished - Emitted when a song finishes playing in a guild
@@ -123,7 +124,7 @@ export class Melodi extends EventEmitter {
         const stream = await videoInfo.download({ type: "audio" });
         const resource = createAudioResource(Readable.from(stream));
         queue.play(resource);
-      } catch (error) {
+      } catch {
         queue.skip();
       }
     });

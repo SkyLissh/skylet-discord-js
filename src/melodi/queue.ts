@@ -16,11 +16,11 @@ const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, 
 
 /**
  * Manages a queue of songs and audio playback for a Discord voice connection.
- * 
+ *
  * Handles song queuing, playback control (play, pause, resume, skip, stop),
  * and emits events for queue state changes. Uses Discord.js voice library
  * for audio streaming and connection management.
- * 
+ *
  * @emits songAdded - Emitted when a song is added to the queue
  * @emits playNext - Emitted when the next song should be fetched and played
  * @emits songStarted - Emitted when a song starts playing
@@ -33,17 +33,17 @@ export class Queue extends EventEmitter {
 
   /** Private list of songs in the queue */
   #songs: VideoInfo[] = [];
-  
+
   /** Private audio player for playback control */
   #player: AudioPlayer;
 
   /**
    * Creates a new Queue instance.
-   * 
+   *
    * Initializes the audio player, subscribes it to the voice connection,
    * and sets up event listeners for player state changes and connection
    * status changes.
-   * 
+   *
    * @param connection - The voice connection to manage audio for
    */
   constructor(connection: VoiceConnection) {
@@ -102,15 +102,15 @@ export class Queue extends EventEmitter {
 
   /**
    * Processes the queue and starts playing the next song if available.
-   * 
+   *
    * Checks if the player is idle and there are songs in the queue.
    * If conditions are met, emits a 'playNext' event to request the song stream.
    * The actual stream fetching is delegated to the Melodi class to maintain
    * separation of concerns.
-   * 
+   *
    * @private
    */
-  async #processQueue() {
+  #processQueue() {
     // If already playing or buffering, do nothing
     if (this.#player.state.status !== AudioPlayerStatus.Idle) return;
 
@@ -125,10 +125,10 @@ export class Queue extends EventEmitter {
 
   /**
    * Plays an audio resource.
-   * 
+   *
    * Starts playback of the provided audio resource and emits a 'songStarted'
    * event with the current song information.
-   * 
+   *
    * @param resource - The audio resource to play
    */
   play(resource: AudioResource) {
@@ -138,11 +138,11 @@ export class Queue extends EventEmitter {
 
   /**
    * Adds one or more songs to the queue.
-   * 
+   *
    * Appends the provided song(s) to the queue and emits a 'songAdded' event.
    * If the player is not currently playing, automatically starts processing
    * the queue.
-   * 
+   *
    * @param song - A single VideoInfo object or an array of VideoInfo objects to add
    */
   add(song: VideoInfo | VideoInfo[]) {
@@ -161,7 +161,7 @@ export class Queue extends EventEmitter {
 
   /**
    * Pauses the currently playing song.
-   * 
+   *
    * Only pauses if a song is currently playing. Has no effect if already paused
    * or if no song is playing.
    */
@@ -173,7 +173,7 @@ export class Queue extends EventEmitter {
 
   /**
    * Resumes playback of a paused song.
-   * 
+   *
    * Only resumes if a song is currently paused. Has no effect if already playing
    * or if no song is paused.
    */
@@ -185,7 +185,7 @@ export class Queue extends EventEmitter {
 
   /**
    * Stops playback and clears the entire queue.
-   * 
+   *
    * Removes all songs from the queue and stops the audio player.
    * This will trigger the 'Idle' event, which may emit a 'queueEmpty' event.
    */
@@ -196,7 +196,7 @@ export class Queue extends EventEmitter {
 
   /**
    * Skips the currently playing song.
-   * 
+   *
    * Stops the current song, which triggers the player's 'Idle' event.
    * This causes the queue to process and play the next song if available.
    */
@@ -206,7 +206,7 @@ export class Queue extends EventEmitter {
 
   /**
    * Cleans up the queue and prepares for disconnection.
-   * 
+   *
    * Stops playback, clears all event listeners from the player,
    * and prepares the queue for garbage collection.
    */

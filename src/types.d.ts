@@ -13,15 +13,15 @@ import type { Melodi } from "./melodi";
 
 export interface SlashCommand {
   command: SharedSlashCommand;
-  execute: (interaction: ChatInputCommandInteraction) => void;
-  autocomplete?: (interaction: AutocompleteInteraction) => void;
-  modal?: (interaction: ModalSubmitInteraction<CacheType>) => void;
+  execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
+  autocomplete?: (interaction: AutocompleteInteraction) => Promise<void>;
+  modal?: (interaction: ModalSubmitInteraction<CacheType>) => Promise<void>;
   cooldown?: number; // in seconds
 }
 
 export interface Command {
   name: string;
-  execute: (message: Message, args: Array<string>) => void;
+  execute: (message: Message, args: Array<string>) => Promise<void>;
   permissions: Array<PermissionResolvable>;
   aliases: Array<string>;
   cooldown?: number;
@@ -29,7 +29,7 @@ export interface Command {
 
 export interface Subcommand {
   name: string;
-  execute: (interaction: ChatInputCommandInteraction) => void;
+  execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
 }
 
 export interface Task {
@@ -45,13 +45,13 @@ interface GuildOptions {
 export type GuildOption = keyof GuildOptions;
 export interface BotEvent {
   name: string;
-  once?: boolean | false;
-  execute: (...args) => void;
+  once?: boolean;
+  execute: (...args) => Promise<void>;
 }
 
 export interface MelodiEvent {
   name: string;
-  execute: (client: Client, ...args) => void;
+  execute: (client: Client, ...args) => Promise<void>;
 }
 
 declare module "discord.js" {

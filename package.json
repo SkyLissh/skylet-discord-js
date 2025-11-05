@@ -9,6 +9,7 @@
     "start:dev": "tsx --env-file=.env.local src/index.ts | pino-pretty -c",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
+    "format": "prettier --write .",
     "updatecmds:dev": "tsx --env-file=.env.local src/update-cmds.ts",
     "updatecmds:prod": "tsx --env-file=.env src/update-cmds.ts",
     "deletecmds:dev": "tsx --env-file=.env.local src/delete-cmds.ts",

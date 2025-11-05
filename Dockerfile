@@ -6,15 +6,13 @@ FROM python-node-base as builder
 
 RUN apt update && apt upgrade -y && apt install --no-install-recommends -y \
   build-essential \
-  ffmpeg \
-  pkg-config \
-  libopus-dev
+  ffmpeg
 
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-RUN OPUS_SYSTEM=1 npm_config_cflags="-DOPUS_DISABLE_INTRINSICS" pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
