@@ -48,6 +48,6 @@ COPY --from=builder /prod/node_modules ./node_modules
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-RUN node dist/update-cmds.js
+RUN node --env-file=.env dist/update-cmds.js
 
 CMD ["node", "dist/index.js"]
