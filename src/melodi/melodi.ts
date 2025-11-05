@@ -21,6 +21,8 @@ import { InvalidUrl, NoResultsFound } from "./errors";
 import type { VideoInfo } from "~/schemas/youtube/video_info";
 import { Queue } from "./queue";
 
+import { logger } from "~/logger";
+
 Platform.shim.eval = (
   data: Types.BuildScriptResult,
   env: Record<string, Types.VMPrimative>
@@ -159,17 +161,21 @@ export class Melodi extends EventEmitter {
     const { id, type } = urlResult;
 
     if (type === "playlist") {
-      const playlist = await this.yt.music.getPlaylist(id);
-      const videos = playlist.contents;
-      if (!videos) return;
+      try {
+        const playlist = await this.yt.music.getPlaylist(id);
+        const videos = playlist.contents;
+        if (!videos) return;
 
-      return videos
-        .map((video) => {
-          if (!video.is(YTNodes.MusicResponsiveListItem)) return;
+        return videos
+          .map((video) => {
+            if (!video.is(YTNodes.MusicResponsiveListItem)) return;
 
-          return video.id;
-        })
-        .filter((id): id is string => id !== undefined);
+            return video.id;
+          })
+          .filter((id): id is string => id !== undefined);
+      } catch (error) {
+        throw error instanceof Error ? error : new Error("Unknown error");
+      }
     }
 
     return id;
@@ -182,15 +188,21 @@ export class Melodi extends EventEmitter {
    * @returns The YouTube video ID for the first song result.
    */
   async #getIdFromSearch(query: string) {
-    const search = await this.yt.music.search(query, { type: "all" });
-    const shelf = search.contents?.firstOfType(YTNodes.MusicShelf);
-    const result = shelf?.contents?.[0];
+    try {
+      const search = await this.yt.music.search(query, { type: "all" });
+      const shelf = search.contents?.firstOfType(YTNodes.MusicShelf);
+      const result = shelf?.contents?.[0];
 
-    if (!result || result.item_type !== "song") {
-      throw new NoResultsFound();
+      if (!result || result.item_type !== "song") {
+        throw new NoResultsFound();
+      }
+
+      return result.id!;
+    } catch (error) {
+      throw error instanceof Error
+        ? error
+        : new Error("Failed to fetch video information");
     }
-
-    return result.id!;
   }
 
   /**
@@ -261,23 +273,30 @@ export class Melodi extends EventEmitter {
       : await this.#getIdFromSearch(song);
 
     if (!videoId) {
-      throw new Error("Failed to resolve video ID");
+      throw new NoResultsFound();
     }
 
-    if (Array.isArray(videoId)) {
-      const videos = await Promise.all(videoId.map((id) => this.yt.music.getInfo(id)));
+    try {
+      if (Array.isArray(videoId)) {
+        const videos = await Promise.all(videoId.map((id) => this.yt.music.getInfo(id)));
 
-      const queue = this.#createQueue(channel.guild.id, connection);
+        const queue = this.#createQueue(channel.guild.id, connection);
 
-      const songs = videos.map((video) => video.basic_info as VideoInfo);
-      queue.add(songs);
-      return songs;
-    } else {
-      const videoInfo = await this.yt.music.getInfo(videoId);
+        const songs = videos.map((video) => video.basic_info as VideoInfo);
+        queue.add(songs);
+        return songs;
+      } else {
+        const videoInfo = await this.yt.music.getInfo(videoId);
 
-      const queue = this.#createQueue(channel.guild.id, connection);
-      queue.add(videoInfo.basic_info as VideoInfo);
-      return videoInfo.basic_info;
+        const queue = this.#createQueue(channel.guild.id, connection);
+        queue.add(videoInfo.basic_info as VideoInfo);
+        return videoInfo.basic_info;
+      }
+    } catch (error) {
+      connection.destroy();
+      throw error instanceof Error
+        ? error
+        : new Error("Failed to fetch video information");
     }
   }
 

@@ -39,15 +39,9 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY . .
 
-CMD ["pnpm", "run", "dev"]
-
 FROM base as production
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /prod/node_modules ./node_modules
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-
-RUN node --env-file=.env dist/update-cmds.js
-
-CMD ["node", "dist/index.js"]
