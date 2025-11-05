@@ -1,8 +1,8 @@
-FROM nikolaik/python-nodejs:python3.14-nodejs24-slim as python-node-base
+FROM nikolaik/python-nodejs:python3.14-nodejs24-slim AS python-node-base
 
 RUN corepack enable
 
-FROM python-node-base as builder
+FROM python-node-base AS builder
 
 RUN apt update && apt upgrade -y && apt install --no-install-recommends -y \
   build-essential \
@@ -24,26 +24,30 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 RUN pnpm install --frozen-lockfile --prod
 
-FROM node:24-slim as base
+FROM node:24-slim AS base
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="${PNPM_HOME}:${PATH}"
 
 RUN corepack enable
 
-COPY --from=builder /usr/bin/ffmpeg /usr/bin/ffmpeg
+RUN apt update && apt install --no-install-recommends -y \
+  ffmpeg
 
 WORKDIR /app
 
-FROM base as development
+FROM base AS development
 
 COPY --from=builder /app/node_modules ./node_modules
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY . .
 
-FROM base as production
+FROM base AS production
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /prod/node_modules ./node_modules
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-CMD [ "node", "dist/index.js" ]
+CMD [ "pnpm", "start" ]
