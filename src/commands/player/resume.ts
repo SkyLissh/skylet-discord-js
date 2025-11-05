@@ -7,7 +7,7 @@ const command: SlashCommand = {
   execute: async (interaction) => {
     interaction.client.melodi.resume(interaction.guild!);
 
-    interaction.reply({
+    await interaction.reply({
       content: ":arrow_forward: Resumed the music",
       flags: "Ephemeral",
     });

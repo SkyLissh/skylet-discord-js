@@ -17,12 +17,22 @@ export default async (client: Client) => {
   });
 
   for (const file of files) {
-    const { default: event }: { default: BotEvent } = await import(
-      pathToFileURL(file).href
-    );
+    const { default: event } = (await import(pathToFileURL(file).href)) as {
+      default: BotEvent;
+    };
 
-    if (event.once) client.once(event.name, (...args) => event.execute(...args));
-    else client.on(event.name, (...args) => event.execute(...args));
+    if (event.once)
+      client.once(event.name, (...args: unknown[]) =>
+        event.execute(...args).catch(() => {
+          logger.error(`🌠 Failed to execute event ${event.name}`);
+        })
+      );
+    else
+      client.on(event.name, (...args: unknown[]) =>
+        event.execute(...args).catch(() => {
+          logger.error(`🌠 Failed to execute event ${event.name}`);
+        })
+      );
 
     logger.info(`🌠 Successfully loaded event ${event.name}`);
   }

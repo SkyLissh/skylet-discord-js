@@ -5,7 +5,7 @@ import type { BotEvent } from "~/types";
 
 const event: BotEvent = {
   name: Events.InteractionCreate,
-  execute: (interaction: Interaction) => {
+  execute: async (interaction: Interaction) => {
     if (interaction.isChatInputCommand()) {
       const command = interaction.client.slashCommands.get(interaction.commandName);
       const cooldown = interaction.client.cooldowns.get(
@@ -14,10 +14,12 @@ const event: BotEvent = {
       if (!command) return;
       if (command.cooldown && cooldown) {
         if (Date.now() < cooldown) {
-          interaction.reply(
+          await interaction.reply(
             `You have to wait ${Math.floor(Math.abs(Date.now() - cooldown) / 1000)} second(s) to use this command again.`
           );
-          setTimeout(() => interaction.deleteReply(), 5000);
+          setTimeout(() => {
+            interaction.deleteReply().catch(() => {});
+          }, 5000);
           return;
         }
         interaction.client.cooldowns.set(
@@ -35,7 +37,7 @@ const event: BotEvent = {
           Date.now() + command.cooldown * 1000
         );
       }
-      command.execute(interaction);
+      await command.execute(interaction);
     } else if (interaction.isAutocomplete()) {
       const command = interaction.client.slashCommands.get(interaction.commandName);
       if (!command) {
@@ -44,7 +46,7 @@ const event: BotEvent = {
       }
       try {
         if (!command.autocomplete) return;
-        command.autocomplete(interaction);
+        await command.autocomplete(interaction);
       } catch (error) {
         console.error(error);
       }
@@ -56,7 +58,7 @@ const event: BotEvent = {
       }
       try {
         if (!command.modal) return;
-        command.modal(interaction);
+        await command.modal(interaction);
       } catch (error) {
         console.error(error);
       }

@@ -18,9 +18,9 @@ export default async (client: Client) => {
   });
 
   for (const file of files) {
-    const { default: cmd }: { default: SlashCommand } = await import(
-      pathToFileURL(file).href
-    );
+    const { default: cmd } = (await import(pathToFileURL(file).href)) as {
+      default: SlashCommand;
+    };
     client.slashCommands.set(cmd.command.name, cmd);
   }
 

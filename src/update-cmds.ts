@@ -22,9 +22,9 @@ const update = async () => {
   });
 
   for (const file of files) {
-    const { default: cmd }: { default: SlashCommand } = await import(
-      pathToFileURL(file).href
-    );
+    const { default: cmd } = (await import(pathToFileURL(file).href)) as {
+      default: SlashCommand;
+    };
     commands.push(cmd.command);
   }
 

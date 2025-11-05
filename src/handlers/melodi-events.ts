@@ -17,11 +17,15 @@ export default async (client: Client) => {
   });
 
   for (const file of files) {
-    const { default: event }: { default: MelodiEvent } = await import(
-      pathToFileURL(file).href
-    );
+    const { default: event } = (await import(pathToFileURL(file).href)) as {
+      default: MelodiEvent;
+    };
 
-    client.melodi.on(event.name, (...args) => event.execute(client, ...args));
+    client.melodi.on(event.name, (...args: unknown[]) =>
+      event.execute(client, ...args).catch(() => {
+        logger.error(`🎵 Failed to execute melodi event ${event.name}`);
+      })
+    );
 
     logger.info(`🎵 Successfully loaded melodi event ${event.name}`);
   }

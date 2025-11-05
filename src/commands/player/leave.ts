@@ -9,7 +9,7 @@ const command: SlashCommand = {
   execute: async (interaction) => {
     interaction.client.melodi.leave(interaction.guild!);
 
-    interaction.reply({
+    await interaction.reply({
       embeds: [
         new EmbedBuilder()
           .setTitle("Left voice channel")

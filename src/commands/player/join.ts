@@ -18,7 +18,7 @@ const command: SlashCommand = {
 
     interaction.client.melodi.join(channel);
 
-    interaction.reply({
+    await interaction.reply({
       embeds: [
         new EmbedBuilder()
           .setAuthor({

@@ -18,7 +18,7 @@ const event: MelodiEvent = {
     const duration = song.duration || 0;
     const formattedDuration = format(new Date(duration * 1000), "mm:ss");
 
-    channel.send({
+    await channel.send({
       embeds: [
         new EmbedBuilder()
           .setColor("#e30026")
