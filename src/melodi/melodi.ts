@@ -20,13 +20,13 @@ import { InvalidUrl, NoResultsFound } from "./errors";
 
 import type { VideoInfo } from "~/schemas/youtube/video_info";
 import { Queue } from "./queue";
-
 import { logger } from "~/logger";
 
-Platform.shim.eval = (
+Platform.shim.eval = async (
   data: Types.BuildScriptResult,
   env: Record<string, Types.VMPrimative>
-): Record<string, string> => {
+  // eslint-disable-next-line @typescript-eslint/require-await
+) => {
   const properties = [];
 
   if (env.n) {
@@ -278,15 +278,22 @@ export class Melodi extends EventEmitter {
 
     try {
       if (Array.isArray(videoId)) {
+        logger.info(`Found ${videoId.length} video IDs`);
         const videos = await Promise.all(videoId.map((id) => this.yt.music.getInfo(id)));
+        logger.info(`Found ${videos.length} videos`);
 
         const queue = this.#createQueue(channel.guild.id, connection);
 
-        const songs = videos.map((video) => video.basic_info as VideoInfo);
+        const songs = videos.map((video) => {
+          logger.info(`Adding ${JSON.stringify(video.basic_info)} to queue`);
+          return video.basic_info as VideoInfo;
+        });
         queue.add(songs);
         return songs;
       } else {
+        logger.info(`Found video ID: ${videoId}`);
         const videoInfo = await this.yt.music.getInfo(videoId);
+        logger.info(`Adding ${JSON.stringify(videoInfo.basic_info)} to queue`);
 
         const queue = this.#createQueue(channel.guild.id, connection);
         queue.add(videoInfo.basic_info as VideoInfo);
