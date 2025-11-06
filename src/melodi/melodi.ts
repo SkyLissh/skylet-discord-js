@@ -11,16 +11,16 @@ import {
 } from "@discordjs/voice";
 import type { Client, GuildResolvable, VoiceBasedChannel } from "discord.js";
 
-import { Innertube, Platform, YTNodes, type Types } from "youtubei.js";
+import { ClientType, Innertube, Platform, YTNodes, type Types } from "youtubei.js";
 
 import * as v from "valibot";
 
 import { parseYouTubeURL } from "~/functions/parse-youtube-url";
 import { InvalidUrl, NoResultsFound } from "./errors";
 
+import { logger } from "~/logger";
 import type { VideoInfo } from "~/schemas/youtube/video_info";
 import { Queue } from "./queue";
-import { logger } from "~/logger";
 
 Platform.shim.eval = async (
   data: Types.BuildScriptResult,
@@ -140,7 +140,14 @@ export class Melodi extends EventEmitter {
    * @returns A ready-to-use Melodi instance.
    */
   static async create(client: Client) {
-    const yt = await Innertube.create();
+    logger.info("Creating Innertube instance");
+
+    const yt = await Innertube.create({
+      enable_session_cache: false,
+      client_type: ClientType.WEB,
+    });
+
+    logger.info("Innertube instance created successfully");
     return new Melodi(client, yt);
   }
 
@@ -191,6 +198,9 @@ export class Melodi extends EventEmitter {
     try {
       const search = await this.yt.music.search(query, { type: "all" });
       const shelf = search.contents?.firstOfType(YTNodes.MusicShelf);
+      shelf?.contents?.forEach((item) => {
+        logger.info(JSON.stringify(item));
+      });
       const result = shelf?.contents?.[0];
 
       if (!result || result.item_type !== "song") {
