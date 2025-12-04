@@ -1,8 +1,6 @@
 import type { Client } from "discord.js";
 import { Events } from "discord.js";
 
-import { CronJob } from "cron";
-
 import { logger } from "~/logger";
 import type { BotEvent } from "~/types";
 
@@ -14,17 +12,6 @@ const event: BotEvent = {
   once: true,
   execute: async (client: Client) => {
     logger.info(`🌠 Ready! ${client.user?.username}`);
-
-    client.tasks.forEach((task) => {
-      CronJob.from({
-        cronTime: task.cronTime,
-        context: client,
-        onTick: () => task.execute(client as unknown as Client),
-        start: true,
-      });
-
-      logger.info(`⏱️ Successfully started ${task.name} task`);
-    });
 
     const savedGuilds = await db.select().from(guilds);
 

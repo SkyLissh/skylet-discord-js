@@ -11,15 +11,16 @@ import {
 } from "@discordjs/voice";
 import type { Client, GuildResolvable, VoiceBasedChannel } from "discord.js";
 
-import { ClientType, Innertube, Platform, YTNodes, type Types } from "youtubei.js";
+import { Innertube, Platform, YTNodes, type Types } from "youtubei.js";
 
 import * as v from "valibot";
 
 import { parseYouTubeURL } from "~/functions/parse-youtube-url";
-import { InvalidUrl, NoResultsFound } from "./errors";
 
 import { logger } from "~/logger";
-import type { VideoInfo } from "~/schemas/youtube/video_info";
+import { VideoInfo } from "~/schemas/youtube/video_info";
+
+import { InvalidUrl, NoResultsFound } from "./errors";
 import { Queue } from "./queue";
 
 Platform.shim.eval = async (
@@ -126,7 +127,8 @@ export class Melodi extends EventEmitter {
         const stream = await videoInfo.download({ type: "audio" });
         const resource = createAudioResource(Readable.from(stream));
         queue.play(resource);
-      } catch {
+      } catch (error) {
+        logger.error(error);
         queue.skip();
       }
     });
@@ -140,14 +142,13 @@ export class Melodi extends EventEmitter {
    * @returns A ready-to-use Melodi instance.
    */
   static async create(client: Client) {
-    logger.info("Creating Innertube instance");
-
     const yt = await Innertube.create({
       enable_session_cache: false,
-      client_type: ClientType.WEB,
+      timezone: "America/New_York",
+      location: "US",
+      lang: "en",
     });
 
-    logger.info("Innertube instance created successfully");
     return new Melodi(client, yt);
   }
 
@@ -198,16 +199,13 @@ export class Melodi extends EventEmitter {
     try {
       const search = await this.yt.music.search(query, { type: "all" });
       const shelf = search.contents?.firstOfType(YTNodes.MusicShelf);
-      shelf?.contents?.forEach((item) => {
-        logger.info(JSON.stringify(item));
-      });
       const result = shelf?.contents?.[0];
 
       if (!result || result.item_type !== "song") {
         throw new NoResultsFound();
       }
 
-      return result.id!;
+      return result.id;
     } catch (error) {
       throw error instanceof Error
         ? error
@@ -288,25 +286,18 @@ export class Melodi extends EventEmitter {
 
     try {
       if (Array.isArray(videoId)) {
-        logger.info(`Found ${videoId.length} video IDs`);
         const videos = await Promise.all(videoId.map((id) => this.yt.music.getInfo(id)));
-        logger.info(`Found ${videos.length} videos`);
 
         const queue = this.#createQueue(channel.guild.id, connection);
 
-        const songs = videos.map((video) => {
-          logger.info(`Adding ${JSON.stringify(video.basic_info)} to queue`);
-          return video.basic_info as VideoInfo;
-        });
+        const songs = v.parse(v.array(VideoInfo), videos);
         queue.add(songs);
         return songs;
       } else {
-        logger.info(`Found video ID: ${videoId}`);
         const videoInfo = await this.yt.music.getInfo(videoId);
-        logger.info(`Adding ${JSON.stringify(videoInfo.basic_info)} to queue`);
 
         const queue = this.#createQueue(channel.guild.id, connection);
-        queue.add(videoInfo.basic_info as VideoInfo);
+        queue.add(v.parse(VideoInfo, videoInfo.basic_info));
         return videoInfo.basic_info;
       }
     } catch (error) {

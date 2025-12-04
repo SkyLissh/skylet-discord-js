@@ -32,12 +32,6 @@ export interface Subcommand {
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
 }
 
-export interface Task {
-  name: string;
-  execute: (client: Client) => void;
-  cronTime: string;
-}
-
 interface GuildOptions {
   prefix: string;
 }
@@ -59,7 +53,6 @@ declare module "discord.js" {
     slashCommands: Collection<string, SlashCommand>;
     commands: Collection<string, Command>;
     cooldowns: Collection<string, number>;
-    tasks: Collection<string, Task>;
     melodi: Melodi;
   }
 }
